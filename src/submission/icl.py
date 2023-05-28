@@ -62,7 +62,31 @@ def get_icl_prompts(
     prompt = ''
 
     ### START CODE HERE ###
-    pass
+    prompt_support_qa, prompt_support_aq, prompt_query_qa = '', '', ''
+    if prompt_mode == 'none':
+        prompt_support_qa = ' '
+        prompt_support_aq = ' '
+        prompt_query_qa = ''
+    elif prompt_mode == 'qa':
+        prompt_support_qa = ' In the '
+        prompt_support_aq = '. '
+        prompt_query_qa = ' In the'
+    elif prompt_mode == 'tldr':
+        prompt_support_qa = ' TL;DR: '
+        prompt_support_aq = '. '
+        prompt_query_qa = ' TL;DR:'
+    elif prompt_mode == 'custom':
+        prompt_support_qa = ' Summarize in one sentence: '
+        prompt_support_aq = '. '
+        prompt_query_qa = ' Summarize in one sentence:'
+
+    if len(support_inputs) > 0:
+        p = np.random.permutation(len(support_inputs))
+        support_inputs, support_labels = np.array(support_inputs)[p].tolist(), np.array(support_labels)[p].tolist()
+        for support_input, support_label in zip(support_inputs, support_labels):
+            prompt += support_input + prompt_support_qa + support_label + prompt_support_aq
+    prompt += test_input + prompt_query_qa
+
     ### END CODE HERE ###
 
     return prompt
@@ -121,9 +145,19 @@ def do_sample(model, input_ids, stop_tokens, max_tokens):
     """
 
     sampled_tokens = []
-
     ### START CODE HERE ###
-    pass
+    with torch.inference_mode():
+        model.eval()
+        for _ in range(max_tokens):
+            with torch.no_grad():
+                outputs = model(input_ids)
+            next_token_logits = outputs.logits[:, -1, :]
+            next_token = torch.argmax(next_token_logits, dim=-1)
+            if next_token in stop_tokens:
+                break
+            sampled_tokens.append(next_token.item())
+            input_ids = torch.cat((input_ids, next_token.unsqueeze(0)), dim=-1)
+
     ### END CODE HERE ###
 
     return sampled_tokens
@@ -177,11 +211,11 @@ def run_icl(models: List[str], datasets_: List[str], ks: List[int], prompt_modes
                             #   https://huggingface.co/docs/transformers/v4.23.1/en/main_classes/tokenizer#transformers.PreTrainedTokenizer.__call__
                             # Note that the tokenizer by default will give you results on the CPU, so you will need to move them to the
                             # proper device.
-
-                            decoded_prediction = ''
-
                             ### START CODE HERE ###
-                            pass
+                            prompt = get_icl_prompts(support_x, support_y, test_input, prompt_mode)
+                            input_ids = tokenizer(prompt, return_tensors='pt')['input_ids'].to(DEVICE)
+                            sampled_tokens = do_sample(model, input_ids, stop_tokens, max_tokens)
+                            decoded_prediction = tokenizer.decode(sampled_tokens)
                             ### END CODE HERE ###
 
                             predictions.append(decoded_prediction)

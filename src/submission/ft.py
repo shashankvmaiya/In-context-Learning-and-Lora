@@ -82,7 +82,9 @@ def parameters_to_fine_tune(model: nn.Module, mode: str) -> List:
 
     if mode == 'all':
         ### START CODE HERE ###
-        pass
+        # Get all the nn.parameters in the model as a list
+        allParam = [param for name, param in model.named_parameters()]
+        return allParam
         ### END CODE HERE ###
     elif mode == 'last':
         ### START CODE HERE ###
@@ -131,7 +133,8 @@ def get_loss(logits: torch.tensor, targets: torch.tensor) -> torch.tensor:
     loss = None
     if logits.dim() == 2:
         ### START CODE HERE ###
-        pass
+        # Calculate the cross entropy loss for classification using logits and targets
+        loss = nn.functional.cross_entropy(logits, targets, ignore_index=-100, reduction='mean')
         ### END CODE HERE ###
     elif logits.dim() == 3:
         ### START CODE HERE ###
@@ -165,10 +168,12 @@ def get_acc(logits, targets):
       A *scalar* representing the average exact-match accuracy over all non-masked batch 
         elements (and sequence timesteps, if applicable)
     """
-
+    accuracy = None
     if logits.dim() == 2:
         ### START CODE HERE ###
-        pass
+        # Calculate the exact match accuracy for classification using logits and targets
+        pred = torch.argmax(logits, dim=1)
+        accuracy = torch.sum(pred == targets) / len(targets)
         ### END CODE HERE ###
     elif logits.dim() == 3:
         ### START CODE HERE ###
@@ -177,6 +182,7 @@ def get_acc(logits, targets):
     else:
         raise ValueError(f'Logits should either be 2-dim (for classification) or 3-dim (for generation); got {logits.dim()}')
 
+    return accuracy
 
 def ft_bert(model, tok, x, y, mode, debug, batch_size=8):
     model = copy.deepcopy(model)
@@ -418,7 +424,7 @@ def run_ft(models: List[str], datasets: List[str], ks: List[int], modes: List[st
 
                     for k_, v in results.items():
                         with open(f'submission/results/{question}/{k_}.json', 'w') as f:
-                            json.dump({'metric': v}, f)
+                            json.dump({'metric': v.item()}, f)
                     results = {}
 
 
