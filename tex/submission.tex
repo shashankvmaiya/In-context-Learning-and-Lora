@@ -10,7 +10,7 @@
 
 % Please do not use the '<SCPD_SUBMISSION_TAG>' character anywhere within your code.  As expected,
 % that will confuse the regular expressions we use to identify your solution.
-\def\assignmentnum{5 }
+\def\assignmentnum{4 }
 \def\assignmenttitle{XCS330 Problem Set \assignmentnum}
 \input{macros}
 \begin{document}
@@ -30,8 +30,15 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_1_bii
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    The accuracy is very poor $(<40\%)$ for both of these models, with bert-med performing slightly better than bert-tiny. Couple of reasons
+
+    \begin{itemize}
+        \item The number of parameters in bert-tiny and bert-med is ~4.4 million and 41.7 million, respectively - which is relatively very less
+        \item Just a handful of examples $(1, 2, 128)$ is being used used to fine tune the entire set of parameters 
+    \end{itemize}
+
+    \includegraphics[width=9cm]{figures/bert_ft_all_plot.png}
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_1_bii
 
@@ -41,8 +48,13 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_1_c
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    \begin{itemize}
+        \item Number of parameters in Bert-mini = 11.2 million
+        \item Space to store each parameter = 4 Byte floats
+    \end{itemize}
+
+    $\Rightarrow$ Total Disk space required to store the fine tuned model = 11.2 million $\times$ 4 bytes = $44.8 \times 10^{6}~\text{bytes} = 44.8~MB$
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_1_c
 
@@ -52,8 +64,12 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_1_d
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    \begin{itemize}
+    \item Number of parameters in Google PaLM LLM = 540 billion = $5.4 \times 10^{9}$
+    \end{itemize}
+
+    $\Rightarrow$ Disk space required to store a PaLM fine tuned model = $5.4 \times 10^{9} \times 4~\text{bytes} = 21.6~GB$
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_1_d
 
@@ -65,10 +81,20 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_2_bii
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    \includegraphics[width=9cm]{figures/icl_babi_plot.png}
+    
+    For the BABI dataset, 'qa' prompt is used which inserts ' In the ' in between every question and answer
+    
+    Observations
+    \begin{itemize}
+    \item Larger model results in better performance (accuracy). Accuracy with full sized GPT2 model (with 1.5B parameters) at $k=16$ shot = 0.736, while the accuracy with med sized GPT2 model (355M parameters) at $k=16$ is 0.688
+    \item Accuracy generally increases with increasing $k$ (number of examples used in the prompt) for both medium and full sized GPT2 model. 
+    \end{itemize}
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_2_bii
+
+\clearpage
 
 \LARGE
 2.c (ii)
@@ -76,23 +102,41 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_2_cii
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    \includegraphics[width=9cm]{figures/icl_xsum_plot.png}
+
+    Observations
+    \begin{itemize}
+        \item \textbf{TL;DR: } prompt outperforms no formatting with a better rogue score. Since xsum dataset measures the performance of summaries, inserting a TL;DR: prompt would help the GPT2 model with a context on what needs to be done.
+        \item Custom prompt: \textbf{Summarize in one sentence: }. Since the xsum dataset consists of labels which are summaries in a single sentence, this prompt was chosen. While the custom prompt yields a better rouge score than none prompt, it has a marginally lower score when compared to the TL;DR: prompt
+        \item Generally, the performance improves with larger number of support examples, i.e., rouge score for zero-shot $<$ one-shot $<$ few-shot. However, there are couple of outliers in the above plot, e.g., a) TL;DR: prompt med model: 4-shot rogue score $<$ 1-shot rogue score b) none prompt (both med and full model): 1-shot rogue score $<$ zero-shot rogue score. These are probably due to smaller sized test set 
+    \end{itemize}
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_2_cii
 
 \clearpage
 
 \LARGE
-3.c
+3.b
 \normalsize
 
-% <SCPD_SUBMISSION_TAG>_3_c
+% <SCPD_SUBMISSION_TAG>_3_b
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    \begin{itemize}
+    \item Number of layers = $L$
+    \item Number of parameters in the weight matrix $W_0^l$ for each layer = $d_1 \times d_2$
+    \item LoRA constrained fine-tuned parameter matrix = $AB^T$
+    \item Size of matrix $A$ = $d_1 \times p$
+    \item Size of matrix $B$ = $d_2 \times p$
+    \item Total number of parameters that would be fined-tuned using LoRA = $d_1 \times p + d_2 \times p = p(d_1+d_2)$
+    \end{itemize}
+
+    $\Rightarrow$ Ratio of the parameters fine-tuned by LoRA to the number of parameters in $W^0_l$ = $ \frac{p(d_1+d_2)}{d_1 \times d_2}$
+    
+    $\Rightarrow$ LoRA will provide the greatest savings in the newly-created parameters if $p << d_1, d_2$ 
+    
 \end{answer}
-% <SCPD_SUBMISSION_TAG>_3_c
+% <SCPD_SUBMISSION_TAG>_3_b
 
 \LARGE
 3.d (ii)
@@ -100,8 +144,16 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_3_dii
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+
+\includegraphics[width=8.5cm]{figures/lora_ft_xsum_plot.png}
+\includegraphics[width=8.5cm]{figures/lora_ft_babi_plot.png}
+
+    Observations
+    \begin{itemize}
+        \item Using a higher rank LoRA residual matrix results in better performance on both xsum and babi datasets (Comparing lora4 vs. lora16)
+        \item LoRA outperforms the other {first, last, middle} fine-tune algorithms for larger number of support examples, though the number of parameters that are fine tuned as less
+    \end{itemize}
+    
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_3_dii
 
@@ -113,8 +165,14 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_4_a
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+
+\includegraphics[width=9cm]{figures/lora_vs_icl_xsum_plot.png}
+
+\begin{itemize}
+    \item In-context learning (tldr) seems like a better choice compared to fine-tuning (lora16) when there are very little support examples $(k=0, 1)$. 
+    \item With higher number of support examples $(k = 4, 8, 128)$, fine-tuning (lora16) offers better performance over in-context learning (tldr)
+    \item This highlights that in-context learning doesn't learn very well from support examples - as well as fine tuning. So, whenever we have more than a couple of support examples, in-context learning wouldn't benefit from these as much as fine-tuning the model would
+\end{itemize}
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_4_a
 
@@ -124,8 +182,29 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_4_b
 \begin{answer}
-    % ### START CODE HERE ###
-    % ### END CODE HERE ###
+Below table summarizes the exact match obtained for in context learning on BABI dataset for 5 random orderings of the prompt. As we can see, there is quite a deviation in these - varying from a low of 0.672 to a high of 0.728. The standard deviation for these = 0.019
+
+In-context learning would have a higher standard deviation than fine-tuning
+
+\begin{center}
+\begin{tabular}{c c}
+ \hline
+ \hline
+ Repeat Idx & Exact Match \\ [0.5ex] 
+ \hline\hline
+1 & 0.688 \\
+ \hline
+2 & 0.728 \\
+ \hline
+3 & 0.712 \\
+ \hline
+4 & 0.696 \\
+ \hline
+5 & 0.672 \\
+ \hline
+\end{tabular}
+\end{center}
+
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_4_b
 
