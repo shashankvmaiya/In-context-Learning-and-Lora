@@ -464,7 +464,7 @@ def run_ft(models: List[str], datasets: List[str], ks: List[int], modes: List[st
 
                     for k_, v in results.items():
                         with open(f'submission/results/{question}/{k_}.json', 'w') as f:
-                            json.dump({'metric': v.item()}, f)
+                            json.dump({'metric': v}, f)
                     results = {}
 
 
