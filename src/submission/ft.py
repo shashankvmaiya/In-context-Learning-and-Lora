@@ -50,7 +50,10 @@ class LoRAConv1DWrapper(nn.Module):
         self.lora_A, self.lora_B = None, None
         ### START CODE HERE ###
         self.lora_A = nn.Parameter(torch.zeros((self.base_module.weight.shape[0], lora_rank)))
-        self.lora_B = nn.Parameter(torch.randn((self.base_module.weight.shape[1], lora_rank)))
+        self.lora_B = nn.Parameter(torch.zeros((self.base_module.weight.shape[1], lora_rank)))
+        # Init LoRA layer with Kaiming uniform
+        import math
+        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
         # Freezing the base module weights
         self.base_module.weight.requires_grad = False
 
