@@ -58,7 +58,7 @@ class LoRAConv1DWrapper(nn.Module):
         self.lora_B = nn.Parameter(torch.zeros((self.base_module.weight.shape[1], lora_rank)))
         # Init LoRA layer with Kaiming uniform
         import math
-        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+        nn.init.kaiming_uniform_(self.lora_A)
 
         ### END CODE HERE ###
 
